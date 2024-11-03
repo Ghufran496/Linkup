@@ -7,6 +7,7 @@
   justify-content: center;
   height: 100vh;
   background-color: #f8f8f8;
+  padding: 20px; /* Add padding for smaller screens */
 }
 
 .logo img {
@@ -19,10 +20,10 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  width: 400px;
-  padding: 50px;
+  width: 100%; /* Full width for small screens */
+  max-width: 400px; /* Maximum width for larger screens */
+  padding: 30px; /* Adjust padding for smaller screens */
   border: 3px solid #43341a;
-
   background-color: #ffffff;
 }
 
@@ -46,31 +47,74 @@
   width: 100%;
 }
 
-.loginButton {
+.loginButton,
+.registerButton {
   margin-top: 0.5rem;
-  width: 7rem;
+  width: 100px; /* Fixed width for better responsiveness */
   height: 2rem;
   font-size: 12px;
   border: none;
   border-radius: 20px;
-  background-color: #a2c5cb;
-  color: #000000;
   cursor: pointer;
 }
 
+.loginButton {
+  background-color: #a2c5cb;
+  color: #000000;
+}
+
 .registerButton {
-  margin-top: 0.5rem;
-  width: 7rem;
-  height: 2rem;
-  font-size: 12px;
-  border: none;
-  border-radius: 20px;
   background-color: #b8a88e;
   color: #000000;
-  cursor: pointer;
 }
 
 .loginButton:hover,
 .registerButton:hover {
   opacity: 0.9;
+}
+
+@media (max-width: 768px) {
+  .formContainer {
+    width: 80%;
+    padding: 20px;
+  }
+
+  .heading {
+    font-size: 14px;
+  }
+
+  .buttonContainer {
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .loginButton,
+  .registerButton {
+    width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  .formContainer {
+    width: 90%;
+    padding: 15px;
+  }
+
+  .heading {
+    font-size: 14px;
+  }
+
+  .inputField {
+    padding: 8px;
+  }
+
+  .buttonContainer {
+    gap: 8px;
+  }
+
+  .loginButton,
+  .registerButton {
+    height: 2.5rem;
+    font-size: 14px;
+  }
 }
