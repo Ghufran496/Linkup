@@ -1,0 +1,98 @@
+/* styles/ProfileInput.module.css */
+
+.profileContainer {
+  padding-top: 5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+
+  margin-left: 10rem;
+  font-family: Arial, sans-serif;
+}
+
+.row {
+  display: flex;
+  gap: 150px;
+  width: 100%;
+  margin-bottom: 40px;
+}
+
+/* .inputGroup {
+  flex: 1;
+} */
+
+.label {
+  font-size: 25px;
+}
+
+.description {
+  margin: 5px 0;
+  font-size: 12px;
+  color: #666;
+}
+
+.inputField {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+.displayOptions {
+  display: flex;
+  gap: 10px;
+  margin-top: 5px;
+}
+
+.optionButton {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 20px;
+  background-color: #a2c5cb;
+  color: #000000;
+  width: 8rem;
+  font-size: 14px;
+
+  cursor: pointer;
+}
+.optionSpaceBottom {
+  margin-bottom: 40px;
+}
+.addPadding {
+  padding-left: 3.2rem;
+}
+.optionButton:hover {
+  opacity: 0.8;
+}
+
+.textArea {
+  width: 100%;
+  height: 80px;
+  padding: 8px;
+  border: 1px solid #333;
+  border-radius: 4px;
+  font-size: 14px;
+  resize: none;
+}
+
+.submitButton {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  background-color: #b2d1d8;
+
+  color: #000000;
+  width: 8rem;
+  font-size: 12px;
+  cursor: pointer;
+  align-self: center;
+  margin-top: 80px;
+}
+.addPaddingRight {
+  width: 20rem;
+}
+
+.submitButton:hover {
+  opacity: 0.9;
+}
