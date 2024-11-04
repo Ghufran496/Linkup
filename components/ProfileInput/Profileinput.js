@@ -15,6 +15,12 @@ const ProfileInputComponent = () => {
   const [location, setLocation] = useState("");
   const [about, setAbout] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
+  const [error, setError] = useState("");
+
+  const showError = (message) => {
+    setError(message);
+    setTimeout(() => setError(""), 3000); // Clear error after 3 seconds
+  };
 
   // Function to format the display name based on selected option
   const getDisplayName = () => {
@@ -29,10 +35,37 @@ const ProfileInputComponent = () => {
     return fullName; // Default to full name if no option selected
   };
 
-  // Function to handle form submission
+  // Function to handle form submission with specific validation checks
   const handleSubmit = async () => {
+    setError("");
+
     if (!userId) {
-      alert("User ID not found. Please log in again.");
+      showError("User ID not found. Please log in again.");
+      return;
+    }
+
+    if (!fullName.trim()) {
+      showError("Full name is required.");
+      return;
+    }
+
+    if (!selectedOption) {
+      showError("Please select a display name format.");
+      return;
+    }
+
+    if (!age || isNaN(age) || age <= 0) {
+      showError("Please enter a valid age.");
+      return;
+    }
+
+    if (!gender.trim()) {
+      showError("Gender is required.");
+      return;
+    }
+
+    if (!location.trim()) {
+      showError("Location is required.");
       return;
     }
 
@@ -54,12 +87,13 @@ const ProfileInputComponent = () => {
       })
       .catch((error) => {
         console.error("Error saving profile data:", error);
-        alert("Failed to save profile data. Please try again.");
+        showError("Failed to save profile data. Please try again.");
       });
   };
 
   return (
     <div className={classes.profileContainer}>
+      {error && <div className={classes.errorPopup}>{error}</div>}
       <div className={classes.row}>
         <div className={classes.inputGroup}>
           <label className={classes.label}>What's your full name?</label>

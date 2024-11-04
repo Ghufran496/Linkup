@@ -14,10 +14,37 @@ export default function Login() {
   const { setUserId } = useUser(); // Access the setUserId function from context
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+
+  const validateEmail = (email) => {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
+  };
+
+  const validatePassword = (password) => {
+    return password.length >= 8;
+  };
+
+  const showError = (message) => {
+    setError(message);
+    setTimeout(() => setError(""), 3000); // Clear error after 3 seconds
+  };
 
   // Function to handle login
   const handleLogin = async (e) => {
     e.preventDefault();
+    setError("");
+
+    if (!validateEmail(email)) {
+      showError("Please enter a valid email address.");
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      showError("Password must be at least 8 characters long.");
+      return;
+    }
+
     try {
       const userCredential = await signInWithEmailAndPassword(
         auth,
@@ -28,13 +55,25 @@ export default function Login() {
       setUserId(userId); // Set userId in context
       router.push("/profileinput"); // Redirect without passing userId in URL
     } catch (error) {
-      console.error("Error signing in:", error.message);
+      showError("Username or password is incorrect");
     }
   };
 
   // Function to handle registration
   const handleRegister = async (e) => {
     e.preventDefault();
+    setError("");
+
+    if (!validateEmail(email)) {
+      showError("Please enter a valid email address.");
+      return;
+    }
+
+    if (!validatePassword(password)) {
+      showError("Password must be at least 8 characters long.");
+      return;
+    }
+
     try {
       const userCredential = await createUserWithEmailAndPassword(
         auth,
@@ -45,12 +84,13 @@ export default function Login() {
       setUserId(userId); // Set userId in context
       router.push("/profileinput"); // Redirect without passing userId in URL
     } catch (error) {
-      console.error("Error registering:", error.message);
+      showError("Error registering: " + error.message);
     }
   };
 
   return (
     <div className={styles.loginContainer}>
+      {error && <div className={styles.errorPopup}>{error}</div>}
       <div className={styles.logo}>
         <img src="/Images/logo.png" alt="Logo" />
       </div>
