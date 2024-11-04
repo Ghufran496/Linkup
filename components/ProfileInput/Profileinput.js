@@ -1,14 +1,14 @@
-// components/ProfileInputComponent.js
 import React, { useState } from "react";
 import { ref, set } from "firebase/database";
 import { useRouter } from "next/router";
 import { database } from "../../lib/firebaseConfig";
 import { useUser } from "../../context/UserContext";
 import classes from "./ProfileInput.module.css";
+import { LuLoader } from "react-icons/lu";
 
 const ProfileInputComponent = () => {
   const router = useRouter();
-  const { userId } = useUser(); // Access userId from context
+  const { userId } = useUser();
   const [fullName, setFullName] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
@@ -16,61 +16,71 @@ const ProfileInputComponent = () => {
   const [about, setAbout] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
   const [error, setError] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+
 
   const showError = (message) => {
     setError(message);
-    setTimeout(() => setError(""), 3000); // Clear error after 3 seconds
+    setTimeout(() => setError(""), 3000);
   };
 
-  // Function to format the display name based on selected option
+  const validateFullName = (name) => /^[A-Za-z\s]+$/.test(name);
+  const validateAge = (age) => age >= 18 && age <= 100;
+  const validateLocation = (location) => /^[A-Za-z0-9\s]+$/.test(location);
+
   const getDisplayName = () => {
     const [firstName, lastName] = fullName.split(" ");
     if (selectedOption === "Max") {
-      return firstName || ""; // First name only
+      return firstName || "";
     } else if (selectedOption === "Max M.") {
-      return `${firstName} ${lastName?.charAt(0) || ""}.`; // First name + Last initial
+      return `${firstName} ${lastName?.charAt(0) || ""}.`;
     } else if (selectedOption === "Max Muster") {
-      return fullName; // Full name
+      return fullName;
     }
-    return fullName; // Default to full name if no option selected
+    return fullName;
   };
 
-  // Function to handle form submission with specific validation checks
   const handleSubmit = async () => {
+    setIsLoading(true);
     setError("");
 
     if (!userId) {
+      setIsLoading(false);
       showError("User ID not found. Please log in again.");
       return;
     }
 
-    if (!fullName.trim()) {
-      showError("Full name is required.");
+    if (!fullName.trim() || !validateFullName(fullName)) {
+      setIsLoading(false);
+      showError("Full name is required and must contain only alphabetic characters.");
       return;
     }
 
     if (!selectedOption) {
+      setIsLoading(false);
       showError("Please select a display name format.");
       return;
     }
 
-    if (!age || isNaN(age) || age <= 0) {
-      showError("Please enter a valid age.");
+    if (!age || isNaN(age) || !validateAge(age)) {
+      setIsLoading(false);
+      showError("Please enter a valid age between 18 and 100.");
       return;
     }
 
     if (!gender.trim()) {
+      setIsLoading(false);
       showError("Gender is required.");
       return;
     }
 
-    if (!location.trim()) {
-      showError("Location is required.");
+    if (!location.trim() || !validateLocation(location)) {
+      setIsLoading(false);
+      showError("Location is required and should contain only alphanumeric characters.");
       return;
     }
 
     const displayName = getDisplayName();
-
     const userRef = ref(database, `users/${userId}/inputfields`);
     const profileData = {
       fullName,
@@ -83,9 +93,11 @@ const ProfileInputComponent = () => {
 
     await set(userRef, profileData)
       .then(() => {
+        setIsLoading(false);
         router.push("/activities");
       })
       .catch((error) => {
+        setIsLoading(false);
         console.error("Error saving profile data:", error);
         showError("Failed to save profile data. Please try again.");
       });
@@ -108,35 +120,39 @@ const ProfileInputComponent = () => {
         </div>
 
         <div className={classes.inputGroup}>
-          <label className={classes.label}>
-            Would you like to display your full name?
-          </label>
+          <label className={classes.label}>Do you want us to display your full name?</label>
           <p className={classes.description}>Please choose a format.</p>
           <div className={classes.displayOptions}>
-            <button
-              className={`${classes.optionButton} ${
-                selectedOption === "Max" ? classes.selected : ""
-              }`}
-              onClick={() => setSelectedOption("Max")}
-            >
+            <label>
+              <input
+                type="radio"
+                name="displayOption"
+                value="Max"
+                checked={selectedOption === "Max"}
+                onChange={() => setSelectedOption("Max")}
+              />
               Max
-            </button>
-            <button
-              className={`${classes.optionButton} ${
-                selectedOption === "Max M." ? classes.selected : ""
-              }`}
-              onClick={() => setSelectedOption("Max M.")}
-            >
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="displayOption"
+                value="Max M."
+                checked={selectedOption === "Max M."}
+                onChange={() => setSelectedOption("Max M.")}
+              />
               Max M.
-            </button>
-            <button
-              className={`${classes.optionButton} ${
-                selectedOption === "Max Muster" ? classes.selected : ""
-              }`}
-              onClick={() => setSelectedOption("Max Muster")}
-            >
+            </label>
+            <label>
+              <input
+                type="radio"
+                name="displayOption"
+                value="Max Muster"
+                checked={selectedOption === "Max Muster"}
+                onChange={() => setSelectedOption("Max Muster")}
+              />
               Max Muster
-            </button>
+            </label>
           </div>
         </div>
       </div>
@@ -154,27 +170,29 @@ const ProfileInputComponent = () => {
           />
         </div>
 
-        <div
-          className={`${classes.inputGroup} ${classes.addPadding} ${classes.paddingforspace}`}
-        >
+        <div className={`${classes.inputGroup} ${classes.addPadding}`}>
           <label className={classes.label}>What is your gender?</label>
-          <p className={classes.description}>Please fill in your gender.</p>
-          <input
-            type="text"
+          <p className={classes.description}>Please tell us what gender you identify with.</p>
+          <select
             className={classes.inputField}
-            placeholder="Gender"
             value={gender}
             onChange={(e) => setGender(e.target.value)}
-          />
+          >
+            <option value="">Select Gender</option>
+            <option value="Male">Male</option>
+            <option value="Female">Female</option>
+            <option value="Non-binary">Non-binary</option>
+            <option value="Other">Other</option>
+          </select>
         </div>
       </div>
 
-      <div className={`${classes.inputGroup} ${classes.optionSpaceBottom}`}>
+      <div className={`${classes.inputGroup}`}>
         <label className={classes.label}>Where do you live?</label>
-        <p className={classes.description}>Please fill in your location.</p>
+        <p className={classes.description}>Please fill in where you live, or if traveling, update later.</p>
         <input
           type="text"
-          className={`${classes.inputField} ${classes.addPaddingRight}`}
+          className={`${classes.inputField}`}
           placeholder="Location"
           value={location}
           onChange={(e) => setLocation(e.target.value)}
@@ -183,19 +201,18 @@ const ProfileInputComponent = () => {
 
       <div className={classes.row}>
         <div className={classes.inputGroup}>
-          <label className={classes.label}>
-            Tell us about yourself (optional)
-          </label>
-          <p className={classes.description}>Please fill in a brief bio.</p>
+          <label className={classes.label}>Tell us about yourself (optional)</label>
+          <p className={classes.description}>If you tell us about yourself, we can display more information to potential acquaintances.</p>
           <textarea
             className={classes.textArea}
+            maxLength="500"
+            placeholder="Tell us about yourself"
             value={about}
             onChange={(e) => setAbout(e.target.value)}
           ></textarea>
         </div>
-
         <button onClick={handleSubmit} className={classes.submitButton}>
-          Submit
+        {isLoading ? <LuLoader /> : "Submit"}
         </button>
       </div>
     </div>
@@ -203,3 +220,4 @@ const ProfileInputComponent = () => {
 };
 
 export default ProfileInputComponent;
+

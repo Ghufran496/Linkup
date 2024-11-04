@@ -70,6 +70,11 @@
 .registerButton:hover {
   opacity: 0.9;
 }
+.loginButtonDisabled {
+  background-color: #d3d3d3; /* Lighter color for disabled state */
+  color: #7a7a7a; /* Gray color for disabled text */
+  cursor: not-allowed; /* Change cursor to indicate disabled */
+}
 
 .errorPopup {
   position: fixed;
