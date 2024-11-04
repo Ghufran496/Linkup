@@ -1,18 +1,75 @@
 // components/ProfileInputComponent.js
-import React from "react";
+import React, { useState } from "react";
+import { ref, set } from "firebase/database";
+import { useRouter } from "next/router";
+import { database } from "../../lib/firebaseConfig";
+import { useUser } from "../../context/UserContext";
 import classes from "./ProfileInput.module.css";
 
 const ProfileInputComponent = () => {
+  const router = useRouter();
+  const { userId } = useUser(); // Access userId from context
+  const [fullName, setFullName] = useState("");
+  const [age, setAge] = useState("");
+  const [gender, setGender] = useState("");
+  const [location, setLocation] = useState("");
+  const [about, setAbout] = useState("");
+  const [selectedOption, setSelectedOption] = useState("");
+
+  // Function to format the display name based on selected option
+  const getDisplayName = () => {
+    const [firstName, lastName] = fullName.split(" ");
+    if (selectedOption === "Max") {
+      return firstName || ""; // First name only
+    } else if (selectedOption === "Max M.") {
+      return `${firstName} ${lastName?.charAt(0) || ""}.`; // First name + Last initial
+    } else if (selectedOption === "Max Muster") {
+      return fullName; // Full name
+    }
+    return fullName; // Default to full name if no option selected
+  };
+
+  // Function to handle form submission
+  const handleSubmit = async () => {
+    if (!userId) {
+      alert("User ID not found. Please log in again.");
+      return;
+    }
+
+    const displayName = getDisplayName();
+
+    const userRef = ref(database, `users/${userId}/inputfields`);
+    const profileData = {
+      fullName,
+      displayName,
+      age,
+      gender,
+      location,
+      about,
+    };
+
+    await set(userRef, profileData)
+      .then(() => {
+        router.push("/activities");
+      })
+      .catch((error) => {
+        console.error("Error saving profile data:", error);
+        alert("Failed to save profile data. Please try again.");
+      });
+  };
+
   return (
     <div className={classes.profileContainer}>
       <div className={classes.row}>
         <div className={classes.inputGroup}>
-          <label className={classes.label}>Whats your full name?</label>
+          <label className={classes.label}>What's your full name?</label>
           <p className={classes.description}>Please fill in your name.</p>
           <input
             type="text"
             className={classes.inputField}
             placeholder="Name"
+            value={fullName}
+            onChange={(e) => setFullName(e.target.value)}
           />
         </div>
 
@@ -20,14 +77,32 @@ const ProfileInputComponent = () => {
           <label className={classes.label}>
             Would you like to display your full name?
           </label>
-          <p className={classes.description}>
-            Do you want us to display your first and last name? Please choose a
-            format.
-          </p>
+          <p className={classes.description}>Please choose a format.</p>
           <div className={classes.displayOptions}>
-            <button className={classes.optionButton}>Max</button>
-            <button className={classes.optionButton}>Max M.</button>
-            <button className={classes.optionButton}>Max Muster</button>
+            <button
+              className={`${classes.optionButton} ${
+                selectedOption === "Max" ? classes.selected : ""
+              }`}
+              onClick={() => setSelectedOption("Max")}
+            >
+              Max
+            </button>
+            <button
+              className={`${classes.optionButton} ${
+                selectedOption === "Max M." ? classes.selected : ""
+              }`}
+              onClick={() => setSelectedOption("Max M.")}
+            >
+              Max M.
+            </button>
+            <button
+              className={`${classes.optionButton} ${
+                selectedOption === "Max Muster" ? classes.selected : ""
+              }`}
+              onClick={() => setSelectedOption("Max Muster")}
+            >
+              Max Muster
+            </button>
           </div>
         </div>
       </div>
@@ -40,6 +115,8 @@ const ProfileInputComponent = () => {
             type="number"
             className={classes.inputField}
             placeholder="Age"
+            value={age}
+            onChange={(e) => setAge(e.target.value)}
           />
         </div>
 
@@ -47,27 +124,26 @@ const ProfileInputComponent = () => {
           className={`${classes.inputGroup} ${classes.addPadding} ${classes.paddingforspace}`}
         >
           <label className={classes.label}>What is your gender?</label>
-          <p className={classes.description}>
-            Please tell us with what gender you identify with.
-          </p>
+          <p className={classes.description}>Please fill in your gender.</p>
           <input
             type="text"
             className={classes.inputField}
             placeholder="Gender"
+            value={gender}
+            onChange={(e) => setGender(e.target.value)}
           />
         </div>
       </div>
 
       <div className={`${classes.inputGroup} ${classes.optionSpaceBottom}`}>
         <label className={classes.label}>Where do you live?</label>
-        <p className={classes.description}>
-          Please tell us where you live or if you're traveling you can change
-          the location later on your profile page.
-        </p>
+        <p className={classes.description}>Please fill in your location.</p>
         <input
           type="text"
           className={`${classes.inputField} ${classes.addPaddingRight}`}
           placeholder="Location"
+          value={location}
+          onChange={(e) => setLocation(e.target.value)}
         />
       </div>
 
@@ -76,14 +152,17 @@ const ProfileInputComponent = () => {
           <label className={classes.label}>
             Tell us about yourself (optional)
           </label>
-          <p className={classes.description}>
-            If you tell us about yourself we can display more information to a
-            potential acquaintance/friend.
-          </p>
-          <textarea className={classes.textArea}></textarea>
+          <p className={classes.description}>Please fill in a brief bio.</p>
+          <textarea
+            className={classes.textArea}
+            value={about}
+            onChange={(e) => setAbout(e.target.value)}
+          ></textarea>
         </div>
 
-        <button className={classes.submitButton}>Submit</button>
+        <button onClick={handleSubmit} className={classes.submitButton}>
+          Submit
+        </button>
       </div>
     </div>
   );

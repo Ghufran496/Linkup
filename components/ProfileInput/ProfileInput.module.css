@@ -49,6 +49,16 @@
   width: 8rem;
   font-size: 14px;
   cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.optionButton:hover {
+  opacity: 0.8;
+}
+
+.selected {
+  background-color: #5a9ea4; /* Darker color for selected state */
+  color: #ffffff; /* Change text color for contrast */
 }
 
 .optionSpaceBottom {
@@ -57,10 +67,6 @@
 
 .addPadding {
   padding-left: 3.2rem;
-}
-
-.optionButton:hover {
-  opacity: 0.8;
 }
 
 .textArea {
