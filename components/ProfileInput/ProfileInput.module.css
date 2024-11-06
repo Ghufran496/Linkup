@@ -17,6 +17,25 @@
 .label {
   font-size: 25px;
 }
+.dropdown {
+  position: absolute;
+  background-color: white;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+  width: 100%;
+  z-index: 1000;
+}
+
+.dropdownOption {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.dropdownOption:hover {
+  background-color: #f0f0f0;
+}
 
 .description {
   margin: 5px 0;
@@ -29,6 +48,12 @@
   padding: 8px;
   border: 1px solid #333;
   border-radius: 4px;
+  font-size: 14px;
+}
+.inputLocation {
+  width: 100%;
+  padding-top: 8px;
+  margin-bottom: 40px;
   font-size: 14px;
 }
 
@@ -150,6 +175,9 @@
   .inputField,
   .addPaddingRight,
   .optionButton {
+    width: 100%;
+  }
+  .inputLocation {
     width: 100%;
   }
 

@@ -1,4 +1,7 @@
+// ProfileInputComponent.js
+
 import React, { useState } from "react";
+import Select from "react-select"; // Import the React Select component
 import { ref, set } from "firebase/database";
 import { useRouter } from "next/router";
 import { database } from "../../lib/firebaseConfig";
@@ -6,18 +9,44 @@ import { useUser } from "../../context/UserContext";
 import classes from "./ProfileInput.module.css";
 import { LuLoader } from "react-icons/lu";
 
+// Define location options
+const locationOptions = [
+  { value: "Bauma", label: "Bauma" },
+  { value: "Elgg", label: "Elgg" },
+  { value: "Fehraltdorf", label: "Fehraltdorf" },
+  { value: "Feldmeilen", label: "Feldmeilen" },
+  { value: "Glattfelden", label: "Glattfelden" },
+  { value: "Hombrechtikon", label: "Hombrechtikon" },
+  { value: "Horgen", label: "Horgen" },
+  { value: "Kilchberg ZH", label: "Kilchberg ZH" },
+  { value: "Kloten", label: "Kloten" },
+  { value: "Mannedorf", label: "Mannedorf" },
+  { value: "Meilen", label: "Meilen" },
+  { value: "Pfaffikon", label: "Pfaffikon" },
+  { value: "Pfaffikon ZH", label: "Pfaffikon ZH" },
+  { value: "Richterswil", label: "Richterswil" },
+  { value: "Ruschlikon", label: "Ruschlikon" },
+  { value: "Ruti", label: "Ruti" },
+  { value: "Schlatt", label: "Schlatt" },
+  { value: "Stafa", label: "Stafa" },
+  { value: "Thalwil", label: "Thalwil" },
+  { value: "Wadenswil", label: "Wadenswil" },
+  { value: "Winterthur", label: "Winterthur" },
+  { value: "Zumikon", label: "Zumikon" },
+  { value: "Zurich", label: "Zurich" },
+];
+
 const ProfileInputComponent = () => {
   const router = useRouter();
   const { userId } = useUser();
   const [fullName, setFullName] = useState("");
   const [age, setAge] = useState("");
   const [gender, setGender] = useState("");
-  const [location, setLocation] = useState("");
+  const [location, setLocation] = useState(null); // Update location to hold an object
   const [about, setAbout] = useState("");
   const [selectedOption, setSelectedOption] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
-
 
   const showError = (message) => {
     setError(message);
@@ -26,7 +55,6 @@ const ProfileInputComponent = () => {
 
   const validateFullName = (name) => /^[A-Za-z\s]+$/.test(name);
   const validateAge = (age) => age >= 18 && age <= 100;
-  const validateLocation = (location) => /^[A-Za-z0-9\s]+$/.test(location);
 
   const getDisplayName = () => {
     const [firstName, lastName] = fullName.split(" ");
@@ -38,6 +66,10 @@ const ProfileInputComponent = () => {
       return fullName;
     }
     return fullName;
+  };
+
+  const handleLocationChange = (selectedOption) => {
+    setLocation(selectedOption); // Update location state with the selected option
   };
 
   const handleSubmit = async () => {
@@ -52,7 +84,9 @@ const ProfileInputComponent = () => {
 
     if (!fullName.trim() || !validateFullName(fullName)) {
       setIsLoading(false);
-      showError("Full name is required and must contain only alphabetic characters.");
+      showError(
+        "Full name is required and must contain only alphabetic characters."
+      );
       return;
     }
 
@@ -74,9 +108,9 @@ const ProfileInputComponent = () => {
       return;
     }
 
-    if (!location.trim() || !validateLocation(location)) {
+    if (!location) {
       setIsLoading(false);
-      showError("Location is required and should contain only alphanumeric characters.");
+      showError("Please select a location.");
       return;
     }
 
@@ -87,7 +121,7 @@ const ProfileInputComponent = () => {
       displayName,
       age,
       gender,
-      location,
+      location: location.value, // Save only the value of the selected option
       about,
     };
 
@@ -106,6 +140,7 @@ const ProfileInputComponent = () => {
   return (
     <div className={classes.profileContainer}>
       {error && <div className={classes.errorPopup}>{error}</div>}
+
       <div className={classes.row}>
         <div className={classes.inputGroup}>
           <label className={classes.label}>What's your full name?</label>
@@ -120,7 +155,9 @@ const ProfileInputComponent = () => {
         </div>
 
         <div className={classes.inputGroup}>
-          <label className={classes.label}>Do you want us to display your full name?</label>
+          <label className={classes.label}>
+            Do you want us to display your full name?
+          </label>
           <p className={classes.description}>Please choose a format.</p>
           <div className={classes.displayOptions}>
             <label>
@@ -172,7 +209,9 @@ const ProfileInputComponent = () => {
 
         <div className={`${classes.inputGroup} ${classes.addPadding}`}>
           <label className={classes.label}>What is your gender?</label>
-          <p className={classes.description}>Please tell us what gender you identify with.</p>
+          <p className={classes.description}>
+            Please tell us what gender you identify with.
+          </p>
           <select
             className={classes.inputField}
             value={gender}
@@ -189,20 +228,28 @@ const ProfileInputComponent = () => {
 
       <div className={`${classes.inputGroup}`}>
         <label className={classes.label}>Where do you live?</label>
-        <p className={classes.description}>Please fill in where you live, or if traveling, update later.</p>
-        <input
-          type="text"
-          className={`${classes.inputField}`}
-          placeholder="Location"
+        <p className={classes.description}>
+          Please fill in where you live, or if traveling, update later.
+        </p>
+        <Select
+          className={classes.inputLocation}
+          options={locationOptions}
           value={location}
-          onChange={(e) => setLocation(e.target.value)}
+          onChange={handleLocationChange}
+          placeholder="Select Location"
+          isSearchable
         />
       </div>
 
       <div className={classes.row}>
         <div className={classes.inputGroup}>
-          <label className={classes.label}>Tell us about yourself (optional)</label>
-          <p className={classes.description}>If you tell us about yourself, we can display more information to potential acquaintances.</p>
+          <label className={classes.label}>
+            Tell us about yourself (optional)
+          </label>
+          <p className={classes.description}>
+            If you tell us about yourself, we can display more information to
+            potential acquaintances.
+          </p>
           <textarea
             className={classes.textArea}
             maxLength="500"
@@ -212,7 +259,7 @@ const ProfileInputComponent = () => {
           ></textarea>
         </div>
         <button onClick={handleSubmit} className={classes.submitButton}>
-        {isLoading ? <LuLoader /> : "Submit"}
+          {isLoading ? <LuLoader /> : "Submit"}
         </button>
       </div>
     </div>
@@ -220,4 +267,3 @@ const ProfileInputComponent = () => {
 };
 
 export default ProfileInputComponent;
-
