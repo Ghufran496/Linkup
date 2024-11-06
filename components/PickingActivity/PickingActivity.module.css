@@ -116,6 +116,7 @@
   color: #000000;
   cursor: pointer;
   margin-top: 25px;
+  margin-bottom: 30px;
   border-radius: 5px;
   font-size: 1rem;
   background-color: #a2c5cb;
@@ -178,4 +179,3 @@
     padding: 12px;
   }
 }
-

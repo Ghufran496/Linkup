@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useUser } from "../../context/UserContext"; 
+import { useUser } from "../../context/UserContext";
 import classes from "./PickingActivity.module.css";
 import { IoMdSearch } from "react-icons/io";
 import { database } from "../../lib/firebaseConfig";
@@ -51,7 +51,7 @@ const activities = [
 ];
 
 const PickingActivityComponent = () => {
-  const { userId } = useUser(); 
+  const { userId } = useUser();
   const [likedActivities, setLikedActivities] = useState([]);
   const [noGoActivities, setNoGoActivities] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
@@ -68,7 +68,21 @@ const PickingActivityComponent = () => {
     activity.toLowerCase().includes(noGoSearchQuery.toLowerCase())
   );
 
-  const handleActivityClick = (activity, setActivities, maxLimit) => {
+  const handleActivityClick = (
+    activity,
+    setActivities,
+    otherActivities,
+    maxLimit
+  ) => {
+    // Check if the activity is in the other list
+    if (otherActivities.includes(activity)) {
+      setError(
+        `You cannot select the same activity for both liked and no-go lists.`
+      );
+      setTimeout(() => setError(""), 3000); // Clear error after 3 seconds
+      return;
+    }
+
     setActivities((prevActivities) => {
       if (prevActivities.includes(activity)) {
         return prevActivities.filter((a) => a !== activity);
@@ -76,7 +90,7 @@ const PickingActivityComponent = () => {
         return [...prevActivities, activity];
       } else {
         setError(`You can only select up to ${maxLimit} activities.`);
-        setTimeout(() => setError(""), 3000); 
+        setTimeout(() => setError(""), 3000); // Clear error after 3 seconds
         return prevActivities;
       }
     });
@@ -107,8 +121,8 @@ const PickingActivityComponent = () => {
       .then(() => set(noGoRef, noGoActivities))
       .then(() => {
         setIsLoading(false);
-        sessionStorage.removeItem("redirectAfterRegister"); 
-        router.push("/userprofile"); 
+        sessionStorage.removeItem("redirectAfterRegister");
+        router.push("/userprofile");
       })
       .catch((error) => {
         setIsLoading(false);
@@ -157,7 +171,12 @@ const PickingActivityComponent = () => {
                     likedActivities.includes(activity) ? classes.selected : ""
                   }`}
                   onClick={() =>
-                    handleActivityClick(activity, setLikedActivities, 10)
+                    handleActivityClick(
+                      activity,
+                      setLikedActivities,
+                      noGoActivities,
+                      10
+                    )
                   }
                 >
                   {activity}
@@ -171,7 +190,12 @@ const PickingActivityComponent = () => {
                 key={activity}
                 className={classes.selectedItem}
                 onClick={() =>
-                  handleActivityClick(activity, setLikedActivities, 10)
+                  handleActivityClick(
+                    activity,
+                    setLikedActivities,
+                    noGoActivities,
+                    10
+                  )
                 }
               >
                 ★ {activity}
@@ -181,6 +205,7 @@ const PickingActivityComponent = () => {
         </div>
       </div>
 
+      {/* No-Go Activities Section */}
       <div className={classes.section}>
         <h2 className={classes.heading2}>
           Which activities are an absolute no-go for you? (multiple selection)
@@ -216,7 +241,12 @@ const PickingActivityComponent = () => {
                     noGoActivities.includes(activity) ? classes.selected : ""
                   }`}
                   onClick={() =>
-                    handleActivityClick(activity, setNoGoActivities, 20)
+                    handleActivityClick(
+                      activity,
+                      setNoGoActivities,
+                      likedActivities,
+                      20
+                    )
                   }
                 >
                   {activity}
@@ -230,7 +260,12 @@ const PickingActivityComponent = () => {
                 key={activity}
                 className={classes.selectedItem}
                 onClick={() =>
-                  handleActivityClick(activity, setNoGoActivities, 20)
+                  handleActivityClick(
+                    activity,
+                    setNoGoActivities,
+                    likedActivities,
+                    20
+                  )
                 }
               >
                 ★ {activity}
