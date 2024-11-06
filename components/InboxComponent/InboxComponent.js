@@ -123,44 +123,53 @@ const InboxComponent = ({ chatId = null, recipientInfos = null }) => {
     }
   }, [selectedChat]);
 
-  // Handle sending a new message
   const handleSendMessage = () => {
     if (newMessage.trim() === "") return;
-
+  
     const messageData = {
       senderId: userId,
       text: newMessage,
       timestamp: new Date().toISOString(),
     };
-
+  
     const messagesRef = ref(database, `messages/${selectedChat}`);
     const newMessageRef = push(messagesRef);
     set(newMessageRef, messageData);
-
-    // Update last message in chat list for current user
+  
+    const recipientId = selectedChat.replace(userId, "").replace("_", "");
+  
+    // Update the current user’s chat list
     const userChatRef = ref(database, `userChats/${userId}/${selectedChat}`);
     set(userChatRef, {
-      recipientId: selectedChat.replace(userId, "").replace("_", ""),
+      recipientId,
       lastMessage: newMessage,
       timestamp: messageData.timestamp,
     });
-
-    // Update the chat list to show the new message and timestamp
+  
+    // Update the recipient’s chat list (for first-time messaging)
+    const recipientChatRef = ref(database, `userChats/${recipientId}/${selectedChat}`);
+    get(recipientChatRef).then((snapshot) => {
+      if (!snapshot.exists()) {
+        set(recipientChatRef, {
+          recipientId: userId,
+          lastMessage: newMessage,
+          timestamp: messageData.timestamp,
+        });
+      }
+    });
+  
+    // Update chatList state
     setChatList((prevChatList) =>
       prevChatList.map((chat) =>
         chat.chatId === selectedChat
-          ? {
-              ...chat,
-              lastMessage: newMessage,
-              timestamp: messageData.timestamp,
-            }
+          ? { ...chat, lastMessage: newMessage, timestamp: messageData.timestamp }
           : chat
       )
     );
-
+  
     setNewMessage("");
   };
-
+  
   return (
     <div className={classes.container}>
       {/* Left Sidebar */}
@@ -173,7 +182,7 @@ const InboxComponent = ({ chatId = null, recipientInfos = null }) => {
           value={searchTerm}
           onChange={(e) => setSearchTerm(e.target.value)}
         />
-        {isLoading ? (
+        {isLoading && chatList.length > 0 ? (
           <div
             style={{
               display: "flex",
