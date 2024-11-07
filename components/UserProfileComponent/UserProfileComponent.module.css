@@ -133,6 +133,34 @@
   align-items: center;
 }
 
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+  background-color: #f4f5f7;
+  padding: 0.5rem;
+  width: 469px;
+  height: 40px;
+  border-radius: 8px;
+}
+
+.tagLike {
+  padding: 0.3rem 0.6rem;
+  background-color: #d6eaf8;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: #333;
+}
+
+.tagDislike {
+  padding: 0.3rem 0.6rem;
+  background-color: #f8d7da;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  color: #333;
+}
+
 .menuItem:hover,
 .active {
   background-color: #eef4ff;
@@ -171,13 +199,21 @@
 }
 
 .mainContent {
-  flex: 1;
   display: flex;
   justify-content: flex-end;
   align-items: flex-start;
   padding: 2rem;
   background-color: #f9fafb;
 }
+.bio {
+  width: 400px;
+  height: 173px;
+  border-radius: 8px;
+  background-color: #f4f5f7;
+  padding: 0.5rem;
+  border-radius: 5px;
+}
+
 .showPopupButton,
 .editButton,
 .searchButton {
@@ -237,6 +273,12 @@
     padding: 0.4rem 0.8rem;
     font-size: 0.8rem;
   }
+  .profileInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 }
 
 @media (max-width: 768px) {
@@ -255,6 +297,12 @@
     flex-direction: column;
     align-items: center;
     font-size: 0.8rem;
+  }
+  .profileInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 }
 
@@ -283,5 +331,32 @@
   .profileImage {
     width: 60px;
     height: 60px;
+  }
+
+  .profileInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .tags {
+    width: auto;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  .bio {
+    width: 100px;
+    height: auto;
+  }
+}
+
+@media (max-width: 300px) {
+  .profileInfo {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
   }
 }

@@ -19,11 +19,16 @@ const UserProfileComponent = () => {
   // Fetch user data when component mounts
   useEffect(() => {
     if (userId) {
-      const userRef = ref(database, `users/${userId}/inputfields`);
+      const userRef = ref(database, `users/${userId}`);
       get(userRef)
         .then((snapshot) => {
           if (snapshot.exists()) {
-            setUserData(snapshot.val());
+            const data = snapshot.val();
+            setUserData({
+              ...data.inputfields,
+              likes: data.likedActivities || [],
+              dislikes: data.noGoActivities || [],
+            });
           } else {
             console.log("No user data available");
           }
@@ -147,41 +152,76 @@ const UserProfileComponent = () => {
           Logout
         </button>
       </aside>
-      <main className={classes.mainContent}>
-        <button onClick={toggleModal} className={classes.showPopupButton}>
-          Upload Pic
-        </button>
-        {showModal && (
-          <div className={classes.modalOverlay}>
-            <div className={classes.modalContent}>
-              <h2>Upload Your Profile Pic</h2>
-              <div className={classes.imageUploadSection}>
-                <input
-                  type="file"
-                  accept="image/*"
-                  onChange={handleImageChange}
-                />
-                <button
-                  onClick={saveProfileImage}
-                  disabled={uploading || !profileImage}
-                  className={classes.uploadButton}
-                >
-                  {uploading ? "Uploading..." : "Upload Image"}
+      <div style={{width:"100%"}}>
+        <main className={classes.mainContent}>
+          <button onClick={toggleModal} className={classes.showPopupButton}>
+            Upload Pic
+          </button>
+          {showModal && (
+            <div className={classes.modalOverlay}>
+              <div className={classes.modalContent}>
+                <h2>Upload Your Profile Pic</h2>
+                <div className={classes.imageUploadSection}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageChange}
+                  />
+                  <button
+                    onClick={saveProfileImage}
+                    disabled={uploading || !profileImage}
+                    className={classes.uploadButton}
+                  >
+                    {uploading ? "Uploading..." : "Upload Image"}
+                  </button>
+                </div>
+                <button onClick={toggleModal} className={classes.closeButton}>
+                  Close
                 </button>
               </div>
-              <button onClick={toggleModal} className={classes.closeButton}>
-                Close
-              </button>
+            </div>
+          )}
+          <button className={classes.editButton}>Edit</button>
+          <button onClick={searchButton} className={classes.searchButton}>
+            Search
+          </button>
+        </main>
+
+        <div
+          className={classes.profileInfo}
+          style={{
+            display: "flex",
+            gap: "5rem",
+            justifyContent: "space-evenly",
+          }}
+        >
+          <div>
+            <h4>About me</h4>
+            <div>
+            <p className={classes.bio}>{userData?.about || "No bio provided"}</p>
             </div>
           </div>
-        )}
-        <button onClick={editButton} className={classes.editButton}>
-          Edit
-        </button>
-        <button onClick={searchButton} className={classes.searchButton}>
-          Search
-        </button>
-      </main>
+          <div>
+            <h4>Likes</h4>
+            <div className={classes.tags}>
+              {userData?.likes?.map((like, idx) => (
+                <span key={idx} className={classes.tagLike}>
+                  {like}
+                </span>
+              ))}
+            </div>
+
+            <h4>Dislikes</h4>
+            <div className={classes.tags}>
+              {userData?.dislikes?.map((dislike, idx) => (
+                <span key={idx} className={classes.tagDislike}>
+                  {dislike}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
