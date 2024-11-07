@@ -283,11 +283,7 @@ const PickingActivityComponent = () => {
           alignItems: "flex-end",
         }}
       >
-        <button
-          onClick={handleSubmit}
-          className={classes.submitButton}
-          disabled={likedActivities.length === 0}
-        >
+        <button onClick={handleSubmit} className={classes.submitButton}>
           {isLoading ? <LuLoader /> : "Submit"}
         </button>
       </div>
