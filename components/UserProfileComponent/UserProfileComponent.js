@@ -52,6 +52,9 @@ const UserProfileComponent = () => {
   const searchButton = () => {
     router.replace("/search");
   };
+  const editButton = () => {
+    router.replace("/editprofile");
+  };
 
   // Handle file selection
   const handleImageChange = (e) => {
@@ -172,7 +175,9 @@ const UserProfileComponent = () => {
             </div>
           </div>
         )}
-        <button className={classes.editButton}>Edit</button>
+        <button onClick={editButton} className={classes.editButton}>
+          Edit
+        </button>
         <button onClick={searchButton} className={classes.searchButton}>
           Search
         </button>
