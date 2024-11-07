@@ -6,6 +6,49 @@ import { database } from "../../lib/firebaseConfig";
 import { useUser } from "../../context/UserContext";
 import { LuLoader } from "react-icons/lu";
 
+const activities = [
+  "Antiquing",
+  "Astrology",
+  "Athletics",
+  "Baking",
+  "Baseball",
+  "Basketball",
+  "Boardgames",
+  "Bowling",
+  "Camping",
+  "Chess",
+  "Climbing",
+  "Cooking",
+  "Dancing",
+  "Escape Rooms",
+  "Fishing",
+  "Fitness",
+  "Gardening",
+  "Gaming",
+  "Golf",
+  "Hiking",
+  "Horseback riding",
+  "Karaoke",
+  "Karate",
+  "Painting",
+  "Photography",
+  "Pilates",
+  "Reading",
+  "Running",
+  "Sailing",
+  "Salsa",
+  "Shopping",
+  "Skiing",
+  "Skydiving",
+  "Snowboarding",
+  "Soccer",
+  "Spinning",
+  "Surfing",
+  "Swimming",
+  "Testing Restaurants",
+  "Yoga",
+];
+
 const SearchComponent = () => {
   const router = useRouter();
   const [isLoginLoading, setIsLoginLoading] = useState(false);
@@ -14,6 +57,7 @@ const SearchComponent = () => {
   const [nameSearch, setNameSearch] = useState("");
   const [genderSearch, setGenderSearch] = useState("");
   const [selectedProfile, setSelectedProfile] = useState(null);
+  const [filteredProfiles, setFilteredProfiles] = useState([]);
   const { userId } = useUser();
 
   useEffect(() => {
@@ -25,7 +69,7 @@ const SearchComponent = () => {
         if (snapshot.exists()) {
           const data = snapshot.val();
           const formattedProfiles = Object.keys(data).map((userId) => ({
-            userId, // Store the userId for generating chatId
+            userId,
             name:
               data[userId].inputfields.displayName ||
               data[userId].inputfields.fullName ||
@@ -39,8 +83,8 @@ const SearchComponent = () => {
             dislikes: data[userId].noGoActivities || [],
             image: data[userId].inputfields.profileImage || "/Images/image.png",
           }));
-          console.log(formattedProfiles);
           setProfiles(formattedProfiles);
+          setFilteredProfiles(formattedProfiles); // Initialize with all profiles
         }
         setIsLoginLoading(false);
       } catch (error) {
@@ -50,26 +94,24 @@ const SearchComponent = () => {
     fetchProfiles();
   }, []);
 
-  const filteredProfiles = profiles.filter((profile) => {
-    const isNotCurrentUser = profile.userId !== userId; // Exclude current user's profile
-
-    const activityMatch =
-      activitySearch === "" ||
-      profile.matchedThrough.some((activity) =>
-        activity.toLowerCase().includes(activitySearch.toLowerCase())
-      );
-
-    const nameMatch =
-      nameSearch === "" ||
-      profile.name.toLowerCase().includes(nameSearch.toLowerCase());
-
-    const genderMatch = genderSearch === "" || profile.gender === genderSearch;
-
-    return isNotCurrentUser && activityMatch && nameMatch && genderMatch;
-  });
+  const handleSearch = () => {
+    const result = profiles.filter((profile) => {
+      const isNotCurrentUser = profile.userId !== userId;
+      const activityMatch =
+        activitySearch === "" ||
+        profile.matchedThrough.includes(activitySearch);
+      const nameMatch =
+        nameSearch === "" ||
+        profile.name.toLowerCase().includes(nameSearch.toLowerCase());
+      const genderMatch =
+        genderSearch === "" || profile.gender === genderSearch;
+      return isNotCurrentUser && activityMatch && nameMatch && genderMatch;
+    });
+    setFilteredProfiles(result);
+  };
 
   const messageButton = (profileUserId) => {
-    router.push(`/inbox/${profileUserId}`);
+    router.push(`/messages/${profileUserId}`);
   };
 
   return (
@@ -78,12 +120,18 @@ const SearchComponent = () => {
       <div className={classes.filters}>
         <div className={classes.filter}>
           <label>Activity</label>
-          <input
-            type="text"
-            placeholder="Search activities..."
+          <select
+            className={classes.inputField}
             value={activitySearch}
             onChange={(e) => setActivitySearch(e.target.value)}
-          />
+          >
+            <option value="">Select Activity</option>
+            {activities.map((activity, index) => (
+              <option key={index} value={activity}>
+                {activity}
+              </option>
+            ))}
+          </select>
         </div>
         <div className={classes.filter}>
           <label>Name</label>
@@ -108,18 +156,14 @@ const SearchComponent = () => {
             <option value="Other">Other</option>
           </select>
         </div>
+        <button onClick={handleSearch} className={classes.searchButton}>
+          Search
+        </button>
       </div>
 
       {/* Profiles List */}
       {isLoginLoading ? (
-        <div
-          style={{
-            display: "flex",
-            justifyContent: "center",
-            alignItems: "center",
-            height: "100vh",
-          }}
-        >
+        <div className={classes.loader}>
           <LuLoader style={{ width: "50px", height: "50px" }} />
         </div>
       ) : (
@@ -170,6 +214,7 @@ const SearchComponent = () => {
           )}
         </div>
       )}
+
       {/* Profile Modal */}
       {selectedProfile && (
         <div

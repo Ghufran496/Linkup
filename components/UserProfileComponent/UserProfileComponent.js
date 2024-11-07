@@ -39,7 +39,7 @@ const UserProfileComponent = () => {
     }
   }, [userId]);
   const messageButton = () => {
-    router.push("/inbox");
+    router.push("/messages");
   };
 
   const handleLogout = async () => {
@@ -152,7 +152,7 @@ const UserProfileComponent = () => {
           Logout
         </button>
       </aside>
-      <div style={{width:"100%"}}>
+      <div style={{ width: "100%" }}>
         <main className={classes.mainContent}>
           <button onClick={toggleModal} className={classes.showPopupButton}>
             Upload Pic
@@ -181,7 +181,9 @@ const UserProfileComponent = () => {
               </div>
             </div>
           )}
-          <button className={classes.editButton}>Edit</button>
+          <button onClick={editButton} className={classes.editButton}>
+            Edit
+          </button>
           <button onClick={searchButton} className={classes.searchButton}>
             Search
           </button>
@@ -198,7 +200,9 @@ const UserProfileComponent = () => {
           <div>
             <h4>About me</h4>
             <div>
-            <p className={classes.bio}>{userData?.about || "No bio provided"}</p>
+              <p className={classes.bio}>
+                {userData?.about || "No bio provided"}
+              </p>
             </div>
           </div>
           <div>
