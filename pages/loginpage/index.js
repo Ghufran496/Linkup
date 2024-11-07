@@ -1,11 +1,12 @@
 import Head from "next/head";
 import React, { useEffect, useState } from "react";
 import { useRouter } from "next/router";
-import LandingPage from "../components/LandingPage/LandingPage";
-import { useUser } from "../context/UserContext";
+import Login from "../../components/RegistrationPage/Login";
+
+import { useUser } from "../../context/UserContext";
 import { LuLoader } from "react-icons/lu";
 
-export default function Home() {
+export default function Loginpage() {
   const router = useRouter();
   const { userId } = useUser();
   const [isLoading, setIsLoading] = useState(false);
@@ -38,8 +39,7 @@ export default function Home() {
         <LuLoader />
       ) : (
         <div>
-          {/* <Login /> */}
-          <LandingPage></LandingPage>
+          <Login />
         </div>
       )}
     </section>

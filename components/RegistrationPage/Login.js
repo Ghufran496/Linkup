@@ -5,13 +5,13 @@ import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
 } from "firebase/auth";
-import { useUser } from "../../context/UserContext"; 
+import { useUser } from "../../context/UserContext";
 import styles from "./Login.module.css";
 import { LuLoader } from "react-icons/lu";
 
 export default function Login() {
   const router = useRouter();
-  const { setUserId } = useUser(); 
+  const { setUserId } = useUser();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -29,7 +29,7 @@ export default function Login() {
 
   const showError = (message) => {
     setError(message);
-    setTimeout(() => setError(""), 3000); 
+    setTimeout(() => setError(""), 3000);
   };
 
   const handleLogin = async (e) => {
@@ -56,9 +56,9 @@ export default function Login() {
         password
       );
       const userId = userCredential.user.uid;
-      setUserId(userId); 
+      setUserId(userId);
       setIsLoginLoading(false);
-      router.push("/userprofile"); 
+      router.push("/userprofile");
     } catch (error) {
       setIsLoginLoading(false);
       showError("Username or password is incorrect");
@@ -83,13 +83,17 @@ export default function Login() {
     }
 
     try {
-      const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+      const userCredential = await createUserWithEmailAndPassword(
+        auth,
+        email,
+        password
+      );
       const userId = userCredential.user.uid;
-      setUserId(userId); 
-      sessionStorage.setItem("userId", userId); 
-      sessionStorage.setItem("redirectAfterRegister", "true"); 
+      setUserId(userId);
+      sessionStorage.setItem("userId", userId);
+      sessionStorage.setItem("redirectAfterRegister", "true");
       setIsRegisterLoading(false);
-      router.push("/profileinput"); 
+      router.push("/profileinput");
     } catch (error) {
       setIsRegisterLoading(false);
       showError("Error registering: " + error.message);
@@ -102,7 +106,7 @@ export default function Login() {
     <div className={styles.loginContainer}>
       {error && <div className={styles.errorPopup}>{error}</div>}
       <div className={styles.logo}>
-        <img src="/Images/logo.png" alt="Logo" />
+        <img src="/Images/landinglogo.png" alt="Logo" />
       </div>
       <div className={styles.formContainer}>
         <h2 className={styles.heading}>Email-Address</h2>
@@ -125,17 +129,18 @@ export default function Login() {
         <div className={styles.buttonContainer}>
           <button
             onClick={handleLogin}
-            className={`${styles.loginButton} ${isLoginDisabled ? styles.loginButtonDisabled : ""}`}
+            className={`${styles.loginButton} ${
+              isLoginDisabled ? styles.loginButtonDisabled : ""
+            }`}
             disabled={isLoginDisabled}
           >
-             {isLoginLoading ? <LuLoader /> : "Login"}  
+            {isLoginLoading ? <LuLoader /> : "Login"}
           </button>
           <button onClick={handleRegister} className={styles.registerButton}>
-          {isRegisterLoading ? <LuLoader /> : "Register"}  
+            {isRegisterLoading ? <LuLoader /> : "Register"}
           </button>
         </div>
       </div>
     </div>
   );
 }
-
