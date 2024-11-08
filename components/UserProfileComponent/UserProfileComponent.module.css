@@ -213,7 +213,14 @@
   padding: 0.5rem;
   border-radius: 5px;
 }
-
+.location {
+  width: 200px;
+  height: auto;
+  border-radius: 8px;
+  background-color: #f4f5f7;
+  padding: 0.5rem;
+  border-radius: 5px;
+}
 .showPopupButton,
 .editButton,
 .searchButton {
@@ -245,9 +252,9 @@
     padding: 0.5rem 1rem;
   }
 
-  .profileSection {
+  /* .profileSection {
     display: none;
-  }
+  } */
 
   .navMenu {
     flex-direction: row;

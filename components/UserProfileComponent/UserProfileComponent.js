@@ -113,11 +113,6 @@ const UserProfileComponent = () => {
   return (
     <div className={classes.container}>
       <aside className={classes.sidebar}>
-        <div className={classes.topSection}>
-          <span className={classes.hamburgerMenu}>☰</span>
-          <h2 className={classes.title}>Constructor</h2>
-          <span className={classes.moreIcon}>⋮</span>
-        </div>
         <div className={classes.profileSection}>
           <img
             src={userData?.profileImage || "/Images/image.jpg"} // Default image if profile image is not provided
@@ -202,6 +197,14 @@ const UserProfileComponent = () => {
             <div>
               <p className={classes.bio}>
                 {userData?.about || "No bio provided"}
+              </p>
+            </div>
+          </div>
+          <div>
+            <h4>Location</h4>
+            <div>
+              <p className={classes.location}>
+                {userData?.location || "No bio provided"}
               </p>
             </div>
           </div>
