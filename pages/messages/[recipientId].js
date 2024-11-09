@@ -12,7 +12,7 @@ const ChatWithRecipient = () => {
   const [chatId, setChatId] = useState(null);
   const [recipientInfo, setRecipientInfo] = useState({
     name: "",
-    image: "/Images/inbox.png",
+    image: "",
   }); // Default image
 
   useEffect(() => {
@@ -36,13 +36,32 @@ const ChatWithRecipient = () => {
 
   // Fetch recipient information
   const fetchRecipientInfo = async (recipientId) => {
-    const userRef = ref(database, `users/${recipientId}/inputfields`);
-    const snapshot = await get(userRef);
-    if (snapshot.exists()) {
-      const data = snapshot.val();
+    try {
+      const userRef1 = ref(database, `users/${recipientId}/inputfields`);
+      const userRef2 = ref(database, `users/${recipientId}`);
+
+      // Fetch both snapshots
+      const [snapshot1, snapshot2] = await Promise.all([
+        get(userRef1),
+        get(userRef2),
+      ]);
+
+      // Get data from each snapshot if it exists, otherwise use default values
+      const data1 = snapshot1.exists() ? snapshot1.val() : {};
+      const data2 = snapshot2.exists() ? snapshot2.val() : {};
+
+      // Set recipient info using data from both paths, with fallbacks
+      console.log("ssssssss" + data2.profilepic);
       setRecipientInfo({
-        name: data.displayName || "Unknown User",
-        image: data.profileImage || "/Images/inbox.png", // Adjust field name if different
+        name: data1.displayName || "Unknown User",
+        image: data2.profilepic || "/Images/Image.png",
+      });
+      console.log("ssssssssccc" + recipientInfo.image, recipientInfo.name);
+    } catch (error) {
+      console.error("Error fetching recipient info:", error);
+      setRecipientInfo({
+        name: "Unknown User",
+        image: "/Images/Image.png",
       });
     }
   };

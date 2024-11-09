@@ -11,7 +11,7 @@ const InboxComponent = ({ chatId = null, recipientInfos = null }) => {
   const [newMessage, setNewMessage] = useState("");
   const [chatList, setChatList] = useState([]);
   const [selectedChat, setSelectedChat] = useState(chatId);
-  const [recipientInfo, setRecipientInfo] = useState(null); // State to hold recipient info
+  const [recipientInfo, setRecipientInfo] = useState(recipientInfos); // State to hold recipient info
   const { userId } = useUser();
   const [searchTerm, setSearchTerm] = useState("");
 
@@ -46,16 +46,26 @@ const InboxComponent = ({ chatId = null, recipientInfos = null }) => {
 
   // Helper function to get user name and profile image by userId
   const fetchUserInfo = async (userId) => {
-    const userRef = ref(database, `users/${userId}/inputfields`);
-    const snapshot = await get(userRef);
-    if (snapshot.exists()) {
-      const { displayName, profileImage } = snapshot.val();
+    const userRef1 = ref(database, `users/${userId}/inputfields`);
+    const userRef2 = ref(database, `users/${userId}`);
+
+    try {
+      const [snapshot1, snapshot2] = await Promise.all([
+        get(userRef1),
+        get(userRef2),
+      ]);
+
+      const data1 = snapshot1.exists() ? snapshot1.val() : {};
+      const data2 = snapshot2.exists() ? snapshot2.val() : {};
+
       return {
-        name: displayName || "Unknown User",
-        image: profileImage || "/Images/inbox.png",
+        name: data1.displayName || "Unknown User",
+        image: data2.profilepic || "/Images/Image.png",
       };
+    } catch (error) {
+      console.error("Error fetching user info:", error);
+      return { name: "Unknown User", image: "/Images/Image.png" };
     }
-    return { name: "Unknown User", image: "/Images/inbox.png" };
   };
 
   // Fetch list of chats for the current user
@@ -125,19 +135,19 @@ const InboxComponent = ({ chatId = null, recipientInfos = null }) => {
 
   const handleSendMessage = () => {
     if (newMessage.trim() === "") return;
-  
+
     const messageData = {
       senderId: userId,
       text: newMessage,
       timestamp: new Date().toISOString(),
     };
-  
+
     const messagesRef = ref(database, `messages/${selectedChat}`);
     const newMessageRef = push(messagesRef);
     set(newMessageRef, messageData);
-  
+
     const recipientId = selectedChat.replace(userId, "").replace("_", "");
-  
+
     // Update the current user’s chat list
     const userChatRef = ref(database, `userChats/${userId}/${selectedChat}`);
     set(userChatRef, {
@@ -145,9 +155,12 @@ const InboxComponent = ({ chatId = null, recipientInfos = null }) => {
       lastMessage: newMessage,
       timestamp: messageData.timestamp,
     });
-  
+
     // Update the recipient’s chat list (for first-time messaging)
-    const recipientChatRef = ref(database, `userChats/${recipientId}/${selectedChat}`);
+    const recipientChatRef = ref(
+      database,
+      `userChats/${recipientId}/${selectedChat}`
+    );
     get(recipientChatRef).then((snapshot) => {
       if (!snapshot.exists()) {
         set(recipientChatRef, {
@@ -157,19 +170,23 @@ const InboxComponent = ({ chatId = null, recipientInfos = null }) => {
         });
       }
     });
-  
+
     // Update chatList state
     setChatList((prevChatList) =>
       prevChatList.map((chat) =>
         chat.chatId === selectedChat
-          ? { ...chat, lastMessage: newMessage, timestamp: messageData.timestamp }
+          ? {
+              ...chat,
+              lastMessage: newMessage,
+              timestamp: messageData.timestamp,
+            }
           : chat
       )
     );
-  
+
     setNewMessage("");
   };
-  
+
   return (
     <div className={classes.container}>
       {/* Left Sidebar */}
@@ -238,7 +255,11 @@ const InboxComponent = ({ chatId = null, recipientInfos = null }) => {
               }}
             >
               <img
-                src={recipientInfo?.image || "/Images/inbox.png"}
+                src={
+                  recipientInfo?.image
+                    ? recipientInfo?.image
+                    : recipientInfos?.image || "/Images/Image.png"
+                }
                 alt={
                   recipientInfo?.name
                     ? recipientInfo?.name

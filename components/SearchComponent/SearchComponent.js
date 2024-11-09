@@ -68,21 +68,23 @@ const SearchComponent = () => {
         const snapshot = await get(usersRef);
         if (snapshot.exists()) {
           const data = snapshot.val();
-          const formattedProfiles = Object.keys(data).map((userId) => ({
-            userId,
-            name:
-              data[userId].inputfields.displayName ||
-              data[userId].inputfields.fullName ||
-              "Unknown",
-            location: data[userId].inputfields.location || "Unknown",
-            age: data[userId].inputfields.age || "N/A",
-            gender: data[userId].inputfields.gender || "N/A",
-            bio: data[userId].inputfields.about || "No bio available",
-            matchedThrough: data[userId].likedActivities || [],
-            likes: data[userId].likedActivities || [],
-            dislikes: data[userId].noGoActivities || [],
-            image: data[userId].inputfields.profileImage || "/Images/image.png",
-          }));
+          const formattedProfiles = Object.keys(data)
+            .filter((id) => id !== userId)
+            .map((userId) => ({
+              userId,
+              name:
+                data[userId].inputfields.displayName ||
+                data[userId].inputfields.fullName ||
+                "Unknown",
+              location: data[userId].inputfields.location || "Unknown",
+              age: data[userId].inputfields.age || "N/A",
+              gender: data[userId].inputfields.gender || "N/A",
+              bio: data[userId].inputfields.about || "No bio available",
+              matchedThrough: data[userId].likedActivities || [],
+              likes: data[userId].likedActivities || [],
+              dislikes: data[userId].noGoActivities || [],
+              image: data[userId].profilepic || "/Images/image.png",
+            }));
           setProfiles(formattedProfiles);
           setFilteredProfiles(formattedProfiles); // Initialize with all profiles
         }
@@ -93,6 +95,9 @@ const SearchComponent = () => {
     };
     fetchProfiles();
   }, []);
+  const goBack = () => {
+    router.back();
+  };
 
   const handleSearch = () => {
     const result = profiles.filter((profile) => {
@@ -116,6 +121,9 @@ const SearchComponent = () => {
 
   return (
     <div className={classes.container}>
+      <button onClick={goBack} className={classes.back}>
+        Profile
+      </button>
       {/* Filter Section */}
       <div className={classes.filters}>
         <div className={classes.filter}>

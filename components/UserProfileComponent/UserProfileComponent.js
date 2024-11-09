@@ -28,7 +28,9 @@ const UserProfileComponent = () => {
               ...data.inputfields,
               likes: data.likedActivities || [],
               dislikes: data.noGoActivities || [],
+              profileImage: data.profilepic,
             });
+            console.log(userData);
           } else {
             console.log("No user data available");
           }
@@ -38,6 +40,7 @@ const UserProfileComponent = () => {
         });
     }
   }, [userId]);
+
   const messageButton = () => {
     router.push("/messages");
   };
@@ -96,8 +99,8 @@ const UserProfileComponent = () => {
       const imageUrl = await uploadToCloudinary(profileImage);
       if (imageUrl) {
         // Save image URL in Firebase
-        const userRef = ref(database, `users/${userId}/inputfields`);
-        await set(userRef, { ...userData, profileImage: imageUrl });
+        const userRef = ref(database, `users/${userId}/profilepic`);
+        await set(userRef, imageUrl);
         setUserData((prevData) => ({ ...prevData, profileImage: imageUrl })); // Update state
         setProfileImage(null); // Clear selected file
       }
